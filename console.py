@@ -2,6 +2,8 @@
 """ Console Module """
 import cmd
 import sys
+import re
+from models import storae
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -118,10 +120,39 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+
+        parts = arg.split()
+        class_name = parts[0]0
+
+        if args not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+        """Extract parameters from the command"""
+        params_str = ' '.join(parts[1:])
+        params_match = re.findall(r'(\w+)=("[^"]+"|\S+)', params_str)
+        """Parse parameters into a dictionary"""
+        params = {}
+        for key, value in params_match:
+            """Handle string values"""
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1].replace('\\"', '"').replace('_', ' ')
+            """Convert to float if it contains a dot"""
+            elif '.' in value:
+                try:
+                    value = float(value)
+                except ValueError:
+                    print(f"Invalid value for {key}")
+                    return
+            else:
+                try:
+                    value = int(value)
+                except ValueError:
+                    print(f"Invalid value for {key}")
+                    return
+            params[key] = value
+        """Create an instance of the class with the parsed parameters"""
+        new_instance = HBNBCommand.classes[class_name](**params)
+
         storage.save()
         print(new_instance.id)
         storage.save()
