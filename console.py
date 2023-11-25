@@ -116,46 +116,41 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
+        """ Create an object of any class """
+    if not args:
+        print("** class name missing **")
+        return
 
-        parts = arg.split()
-        class_name = parts[0] + '0'
+    parts = args.split()
+    class_name = parts[0]
 
-        if args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        """Extract parameters from the command"""
-        params_str = ' '.join(parts[1:])
-        params_match = re.findall(r'(\w+)=("[^"]+"|\S+)', params_str)
-        """Parse parameters into a dictionary"""
-        params = {}
-        for key, value in params_match:
-            """Handle string values"""
+    if class_name not in HBNBCommand.classes:
+        print("** class doesn't exist **")
+        return
+
+    try:
+        arg_list = args.split(" ")
+        kw = {}
+        for arg in arg_list[1:]:
+            arg_splited = arg.split("=")
+            key, value = arg_splited[0], arg_splited[1]
+
+            # Convert to appropriate types
             if value.startswith('"') and value.endswith('"'):
                 value = value[1:-1].replace('\\"', '"').replace('_', ' ')
-            """Convert to float if it contains a dot"""
             elif '.' in value:
-                try:
-                    value = float(value)
-                except ValueError:
-                    print(f"Invalid value for {key}")
-                    return
+                value = float(value)
             else:
-                try:
-                    value = int(value)
-                except ValueError:
-                    print(f"Invalid value for {key}")
-                    return
-            params[key] = value
-        """Create an instance of the class with the parsed parameters"""
-        new_instance = HBNBCommand.classes[class_name](**params)
+                value = int(value)
 
-        storage.save()
+            kw[key] = value
+
+        new_instance = HBNBCommand.classes[class_name](**kw)
+        new_instance.save()
         print(new_instance.id)
-        storage.save()
+
+    except (SyntaxError, NameError, ValueError) as e:
+        print(f"Error creating instance: {e}")
 
     def help_create(self):
         """ Help information for the create method """
