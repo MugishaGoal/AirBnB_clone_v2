@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""The user's class"""
+"""This is the user class"""
 from sqlalchemy.ext.declarative import declarative_base
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String
@@ -9,12 +9,12 @@ from models.review import Review
 
 
 class User(BaseModel, Base):
-    """The class for user
+    """This is the class for user
     Attributes:
-        email: Email address
-        password: Password for login
-        first_name: First name
-        last_name: Last name
+        email: email address
+        password: password for you login
+        first_name: first name
+        last_name: last name
     """
     __tablename__ = "users"
     email = Column(String(128), nullable=False)
