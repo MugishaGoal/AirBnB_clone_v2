@@ -18,34 +18,20 @@ def do_deploy(archive_path):
         bool: True if successful, False otherwise.
     """
     """Check if the archive exists"""
-    if not exists(archive_path):
+    if exists(archive_path) is False:
         return False
-
     try:
-        """Extract necessary information from the archive_path"""
-        file_name = archive_path.split("/")[-1]
-        base_name = file_name.split(".")[0]
-        release_path = "/data/web_static/releases/"
-
-        """Upload the archive to /tmp/"""
+        file_s = archive_path.split("/")[-1]
+        pa_ext = file_s.split(".")[0]
+        path = "/data/web_static/releases/"
         put(archive_path, '/tmp/')
-
-        """Create necessary directories and extract archive"""
-        run('mkdir -p {}{}/'.format(release_path, base_name))
-        run('tar -xzf /tmp/{} -C {}{}/'.format(file_name, release_path, base_name))
-
-        """Remove the temporary archive"""
-        run('rm /tmp/{}'.format(file_name))
-
-        """Move contents and create symbolic link"""
-        run('mv {0}{1}/web_static/* {0}{1}/'.format(release_path, base_name))
-        run('rm -rf {}{}/web_static'.format(release_path, base_name))
+        run('mkdir -p {}{}/'.format(path, pa_ext))
+        run('tar -xzf /tmp/{} -C {}{}/'.format(file_s, path, pa_ext))
+        run('rm /tmp/{}'.format(file_s))
+        run('mv {0}{1}/web_static/* {0}{1}/'.format(path, pa_ext))
+        run('rm -rf {}{}/web_static'.format(path, pa_ext))
         run('rm -rf /data/web_static/current')
-        run('ln -s {}{}/ /data/web_static/current'.format(release_path, base_name))
-
-        """Print a success message"""
-        print("New version deployed!")
-
+        run('ln -s {}{}/ /data/web_static/current'.format(path, pa_ext))
         return True
 
     except Exception as e:
