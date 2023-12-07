@@ -1,25 +1,66 @@
-#!/usr/bin/env bash
+# 101-setup_web_static.pp
 
-# Install Nginx if not already installed
-sudo apt-get -y update
-sudo apt-get -y install nginx
+# Install Nginx package
+package { 'nginx':
+  ensure => 'installed',
+}
 
-# Create necessary directories if they don't exist
-sudo mkdir -p /data/web_static/releases/test
-sudo mkdir -p /data/web_static/shared
+# Create necessary directories
+file { '/data':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+
+file { '/data/web_static':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+
+file { '/data/web_static/releases':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+
+file { '/data/web_static/shared':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+
+file { '/data/web_static/releases/test':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
 
 # Create a fake HTML file
-echo -e "<html>\n  <head>\n  </head>\n  <body>\n    Holberton School\n  </body>\n</html>" | sudo tee /data/web_static/releases/test/index.html
+file { '/data/web_static/releases/test/index.html':
+  ensure  => 'file',
+  content => '<html>\n  <head>\n  </head>\n  <body>\n    Holberton School\n  </body>\n</html>',
+  owner   => 'ubuntu',
+  group   => 'ubuntu',
+}
 
 # Create or recreate the symbolic link
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
-
-# Give ownership of the /data/ folder to the ubuntu user and group
-sudo chown -R ubuntu:ubuntu /data/
+file { '/data/web_static/current':
+  ensure  => 'link',
+  target  => '/data/web_static/releases/test',
+  owner   => 'ubuntu',
+  group   => 'ubuntu',
+}
 
 # Update Nginx configuration
-config_text="location /hbnb_static {\n\talias /data/web_static/current/;\n}\n"
-sudo sed -i "/server_name _;/a $config_text" /etc/nginx/sites-available/default
+file { '/etc/nginx/sites-available/default':
+  ensure  => 'file',
+  content => "server {\n\tlisten 80 default_server;\n\tserver_name _;\n\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t}\n\n\tlocation / {\n\t\t# your other configurations...\n\t}\n}\n",
+  notify  => Exec['nginx_restart'],
+}
 
-# Restart Nginx
-sudo service nginx restart
+# Restart Nginx when the configuration is updated
+exec { 'nginx_restart':
+  command     => 'service nginx restart',
+  refreshonly => true,
+}
