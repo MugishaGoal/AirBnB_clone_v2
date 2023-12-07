@@ -14,7 +14,7 @@ $nginx_conf = "server {
     }
 
     location /redirect_me {
-        return 301 http://linktr.ee/firdaus_h_salim/;
+        return 301 http://linktr.ee/get_gaulle/;
     }
 
     error_page 404 /404.html;
