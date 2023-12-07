@@ -26,7 +26,7 @@ fi
 ln -s /data/web_static/releases/test /data/web_static/current
 
 # Gives ownership to ubuntu user and group
-chown -R ubuntu:ubuntu /data/
+chown -hR ubuntu:ubuntu /data/
 
 # Updates Nginx configuration
 config="\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current;\n\t}\n"
