@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """New class for SQLAlchemy """
+import os
 from os import getenv
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
@@ -11,7 +12,6 @@ from models.user import User
 from models.place import Place
 from models.review import Review
 from models.amenity import Amenity
-
 
 class DBStorage:
     """Creates tables in an environmental database using SQLAlchemy"""
@@ -30,7 +30,7 @@ class DBStorage:
         if not all((user, passwd, db, host, env)):
             raise EnvironmentError("Missing required environment variables")
 
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
+        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}:3306/{}"
                                       .format(user, passwd, host, db),
                                       pool_pre_ping=True)
 
@@ -80,3 +80,14 @@ class DBStorage:
     def close(self):
         """Terminates the session"""
         self.__session.close()
+
+"""Set the required environment variables"""
+os.environ['HBNB_MYSQL_USER'] = 'hbnb_dev'
+os.environ['HBNB_MYSQL_PWD'] = 'hbnb_dev_pwd'
+os.environ['HBNB_MYSQL_HOST'] = 'localhost'
+os.environ['HBNB_MYSQL_DB'] = 'hbnb_dev_db'
+os.environ['HBNB_ENV'] = 'development'
+
+"""Now create an instance of DBStorage"""
+storage = DBStorage()
+storage.reload()
