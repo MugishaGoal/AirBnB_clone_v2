@@ -52,7 +52,11 @@ def number_odd_or_even_route(n):
     "Number: n is even|odd" only if n is an integer
     '''
     odd_or_even = "odd" if n % 2 != 0 else "even"
-    return render_template('6-number_odd_or_even.html', n=n, odd_or_even=odd_or_even)
+    return render_template(
+        '6-number_odd_or_even.html',
+        n=n,
+        odd_or_even=odd_or_even
+    )
 
 
 if __name__ == "__main__":
