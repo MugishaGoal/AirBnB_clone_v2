@@ -7,6 +7,7 @@ from models.state import State
 
 
 app = Flask(__name__)
+'''The Flask application instance'''
 
 
 @app.teardown_appcontext
